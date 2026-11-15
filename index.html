@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portfólio | Alan N.C. Ferreira</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;800&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef2f7;--grid:#d8e0ec;--ink:#1b2a41;--mute:#5b6b82;--card:#fff;--line:#c5d0e0;--acc:#2f5bff;--acc-ink:#fff;--hl:#ffb703;--term:#1b2a41;--term-ink:#e8eefc}
+:root[data-theme=dark]{--bg:#111a2b;--grid:#1a2640;--ink:#e8eefc;--mute:#9aaac4;--card:#18233a;--line:#2a3856;--acc:#6f8fff;--acc-ink:#0d1526;--term:#0b1220;--term-ink:#e8eefc}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#111a2b;--grid:#1a2640;--ink:#e8eefc;--mute:#9aaac4;--card:#18233a;--line:#2a3856;--acc:#6f8fff;--acc-ink:#0d1526;--term:#0b1220;--term-ink:#e8eefc}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font:400 1.0625rem/1.6 "IBM Plex Sans",system-ui,sans-serif;color:var(--ink);background-color:var(--bg);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:32px 32px}
+.wrap{max-width:960px;margin:0 auto;padding:0 1.25rem}
+h1,h2,h3{font-family:"Bricolage Grotesque",sans-serif;line-height:1.1;margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--hl);outline-offset:2px}
+header{display:flex;justify-content:space-between;align-items:center;padding:1.25rem 0}
+header a{font:500 .95rem "IBM Plex Mono",monospace;color:var(--ink);text-decoration:none}
+.tbtn{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:.35rem .9rem;font-size:.9rem}
+.tbtn:hover{border-color:var(--acc)}
+.hero{padding:3rem 0 2rem}
+.hero h1{font-size:clamp(2.6rem,9vw,5.5rem);font-weight:800;letter-spacing:-.03em}
+.role{margin:1rem 0 0;font:500 clamp(1.1rem,3vw,1.5rem) "IBM Plex Mono",monospace;min-height:2.2em}
+.role::after{content:"";display:inline-block;width:.6ch;height:1.1em;background:var(--hl);vertical-align:-.15em;margin-left:2px;animation:bl 1s steps(1) infinite}
+@keyframes bl{50%{opacity:0}}
+.term{margin-top:2rem;background:var(--term);color:var(--term-ink);border-radius:10px;border:1.5px solid var(--ink);box-shadow:6px 6px 0 var(--acc);overflow:hidden}
+.tbar{display:flex;gap:6px;padding:.6rem .9rem;border-bottom:1px solid #ffffff22}
+.tbar i{width:11px;height:11px;border-radius:50%;background:#ffffff40}
+.out{font:400 .95rem/1.55 "IBM Plex Mono",monospace;padding:1rem;max-height:260px;overflow:auto}
+.out p{margin:0 0 .35rem;white-space:pre-wrap}
+.out .cmd{color:var(--hl)}
+.out .err{color:#ff8a8a}
+.out a{color:var(--hl)}
+.in{display:flex;gap:.6rem;align-items:center;padding:.7rem 1rem;border-top:1px solid #ffffff22;font-family:"IBM Plex Mono",monospace}
+.in span{color:var(--hl)}
+.in input{flex:1;min-width:0;background:none;border:0;color:inherit;font:inherit;outline:0}
+.in:focus-within{background:#ffffff0d}
+.chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.9rem}
+.chip{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:.3rem .85rem;font-size:.95rem}
+.chip:hover{border-color:var(--acc)}
+.chip[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:var(--acc-ink)}
+section{padding:3rem 0 1rem}
+h2{font-size:clamp(1.8rem,5vw,2.6rem);font-weight:800;letter-spacing:-.02em;margin-bottom:.5rem}
+.sub{color:var(--mute);margin:0 0 1.25rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:1rem;margin-top:1.25rem}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:1.1rem;display:flex;flex-direction:column;gap:.6rem}
+.card[hidden]{display:none}
+.card h3{font-size:1.3rem}
+.card p{margin:0;color:var(--mute)}
+.tags{display:flex;flex-wrap:wrap;gap:.35rem}
+.tags span{font:400 .8rem "IBM Plex Mono",monospace;background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:.1rem .45rem}
+.more{display:none;border-top:1.5px dashed var(--line);padding-top:.6rem}
+.card.open{border-color:var(--acc)}
+.card.open .more{display:block}
+.acts{display:flex;gap:.6rem;margin-top:auto}
+.acts button,.acts a{border:1.5px solid var(--ink);background:none;border-radius:6px;padding:.3rem .8rem;font-size:.9rem;color:var(--ink);text-decoration:none}
+.acts button:hover,.acts a:hover{background:var(--ink);color:var(--bg)}
+.empty{color:var(--mute);margin-top:1rem}
+.about{display:grid;gap:1.5rem}
+@media(min-width:720px){.about{grid-template-columns:1.2fr 1fr}}
+.facts{list-style:none;margin:0;padding:0;display:grid;gap:.5rem}
+.facts li{background:var(--card);border:1.5px solid var(--line);border-radius:8px;padding:.6rem .9rem}
+.ct{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:1rem}
+.ct a,.ct button{background:var(--acc);color:var(--acc-ink);border:0;border-radius:8px;padding:.7rem 1.2rem;font-weight:500;text-decoration:none}
+.ct a:hover,.ct button:hover{filter:brightness(1.1)}
+footer{padding:3rem 0 2rem;color:var(--mute);font-size:.9rem}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><a href="#topo">~/portfolio</a><button class="tbtn" id="tema" type="button">Alternar tema</button></header>
+
+<main id="topo">
+<div class="hero">
+<h1 id="nome"></h1>
+<p class="role" id="role" aria-live="off"></p>
+
+<div class="term" role="region" aria-label="Terminal interativo">
+<div class="tbar" aria-hidden="true"><i></i><i></i><i></i></div>
+<div class="out" id="out" aria-live="polite"></div>
+<label class="in"><span>$</span><input id="cmd" autocomplete="off" spellcheck="false" aria-label="Digite um comando" placeholder="digite ajuda e aperte Enter"></label>
+</div>
+<div class="chips" id="atalhos" aria-label="Atalhos de comando"></div>
+</div>
+
+<section id="sobre">
+<h2>Sobre mim</h2>
+<div class="about">
+<p id="bio"></p>
+<ul class="facts" id="fatos"></ul>
+</div>
+</section>
+
+<section id="projetos">
+<h2>Projetos</h2>
+<p class="sub">Toque em uma tecnologia para filtrar. Toque em “Detalhes” para ver mais.</p>
+<div class="chips" id="filtros"></div>
+<div class="grid" id="lista"></div>
+<p class="empty" id="vazio" hidden>Nenhum projeto com essa tecnologia ainda. Escolha outra ou limpe o filtro.</p>
+</section>
+
+<section id="contato">
+<h2>Vamos conversar?</h2>
+<p class="sub">Aberto a estágios, projetos e troca de conhecimento. Me chame pelo GitHub.</p>
+<div class="ct" id="ct"></div>
+</section>
+</main>
+<footer>Feito com HTML, CSS e JavaScript puros.</footer>
+</div>
+
+<script>
+/* ====== EDITE AQUI ====== */
+const EU={
+  nome:"Alan N.C. Ferreira",
+  usuario:"Ayoba2604",
+  local:"São Paulo, Brasil",
+  email:"",
+  linkedin:"",
+  bio:"Estudante de tecnologia que aprende construindo. Tenho repositórios em PHP, Python e JavaScript, de sistemas web a trabalhos de faculdade, e gosto de ver uma ideia virar algo funcionando.",
+  papeis:["Desenvolvedor em formação","Criando sistemas web em PHP","Explorando Python e JavaScript","Aprendendo um commit por vez"]
+};
+const R="https://github.com/Ayoba2604/";
+const PROJETOS=[
+  {nome:"LEGISLA.IA2",desc:"Segunda versão do projeto Legisla.IA, feita em JavaScript.",det:"Projeto em JavaScript que evoluiu da primeira versão do Legisla.IA. Veja o código e o README no repositório.",tech:["JavaScript"],url:R+"LEGISLA.IA2"},
+  {nome:"Gerenciamento de matéria",desc:"Sistema em PHP para gerenciar matérias de Engenharia de Software.",det:"Aplicação web em PHP para organizar as matérias do curso. Veja o código no repositório.",tech:["PHP"],url:R+"Gerenciamento-de-materia-Engenharia-de-Software"},
+  {nome:"Trabalho TAPWM 2º bimestre",desc:"Trabalho do segundo bimestre da disciplina TAPWM, em PHP.",det:"Entrega acadêmica desenvolvida em PHP. Veja o código no repositório.",tech:["PHP"],url:R+"trabalho-TAPWM-2BIM"},
+  {nome:"Trabalho TAP 2º bimestre",desc:"Trabalho do segundo bimestre da disciplina TAP, em Python.",det:"Entrega acadêmica desenvolvida em Python. Veja o código no repositório.",tech:["Python"],url:R+"trabalho-TAP-2BIM"},
+  {nome:"Sistema com Packagist",desc:"Sistema em PHP que usa pacotes do Packagist.",det:"Projeto em PHP que usa bibliotecas instaladas pelo Composer, vindas do Packagist. Veja o código no repositório.",tech:["PHP"],url:R+"sistema_usando_packagist"},
+  {nome:"IBM",desc:"Repositório de atividades IBM, feito em PHP.",det:"Projeto em PHP guardado no repositório IBM. Veja o código no GitHub.",tech:["PHP"],url:R+"IBM"}
+];
+/* ======================== */
+
+const $=s=>document.querySelector(s);
+const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+const techs=[...new Set(PROJETOS.flatMap(p=>p.tech))].sort();
+let filtro=null;
+
+$("#nome").textContent=EU.nome;
+document.title="Portfólio | "+EU.nome;
+$("#bio").textContent=EU.bio;
+[["Local",EU.local],["GitHub","@"+EU.usuario],["Repositórios",PROJETOS.length+" em destaque"]].forEach(([k,v])=>{const li=el("li");const b=el("strong",null,k+": ");li.append(b,document.createTextNode(v));$("#fatos").append(li)});
+
+/* digitação do cargo */
+(function(){
+  const r=$("#role");const reduz=matchMedia("(prefers-reduced-motion:reduce)").matches;
+  if(reduz){r.textContent=EU.papeis[0];return}
+  let i=0,j=0,apagando=false;
+  (function tick(){
+    const t=EU.papeis[i];
+    r.textContent=t.slice(0,j);
+    if(!apagando&&j===t.length){apagando=true;return setTimeout(tick,1600)}
+    if(apagando&&j===0){apagando=false;i=(i+1)%EU.papeis.length}
+    j+=apagando?-1:1;
+    setTimeout(tick,apagando?30:70);
+  })();
+})();
+
+/* projetos */
+const lista=$("#lista");
+PROJETOS.forEach(p=>{
+  const c=el("article","card");c.dataset.tech=p.tech.join("|");
+  c.append(el("h3",null,p.nome),el("p",null,p.desc));
+  const tg=el("div","tags");p.tech.forEach(t=>tg.append(el("span",null,t)));c.append(tg);
+  c.append(el("p","more",p.det));
+  const a=el("div","acts");
+  const b=el("button",null,"Detalhes");b.type="button";b.setAttribute("aria-expanded","false");
+  b.onclick=()=>{const o=c.classList.toggle("open");b.setAttribute("aria-expanded",o);b.textContent=o?"Fechar":"Detalhes"};
+  const l=el("a",null,"Ver no GitHub");l.href=p.url;l.target="_blank";l.rel="noopener";
+  a.append(b,l);c.append(a);lista.append(c);
+});
+const fbox=$("#filtros");
+function desenhaFiltros(){
+  fbox.textContent="";
+  techs.forEach(t=>{
+    const b=el("button","chip",t);b.type="button";b.setAttribute("aria-pressed",filtro===t);
+    b.onclick=()=>aplica(filtro===t?null:t);fbox.append(b);
+  });
+}
+function aplica(t){
+  filtro=t;let n=0;
+  lista.querySelectorAll(".card").forEach(c=>{
+    const ok=!t||c.dataset.tech.split("|").includes(t);c.hidden=!ok;if(ok)n++;
+  });
+  $("#vazio").hidden=n>0;desenhaFiltros();
+}
+desenhaFiltros();
+
+/* contato */
+const ct=$("#ct");
+const m=el("a",null,"Enviar e-mail");m.href="mailto:"+EU.email;
+const li=el("a",null,"LinkedIn");li.href=EU.linkedin;li.target="_blank";li.rel="noopener";
+const gh=el("a",null,"GitHub");gh.href="https://github.com/"+EU.usuario;gh.target="_blank";gh.rel="noopener";
+const cp=el("button",null,"Copiar e-mail");cp.type="button";
+cp.onclick=async()=>{try{await navigator.clipboard.writeText(EU.email);cp.textContent="E-mail copiado";setTimeout(()=>cp.textContent="Copiar e-mail",2000)}catch(e){cp.textContent="Copie: "+EU.email}};
+if(EU.email)ct.append(m,cp);
+if(EU.linkedin)ct.append(li);
+ct.append(gh);
+
+/* tema */
+const root=document.documentElement;
+try{const s=localStorage.getItem("tema");if(s)root.dataset.theme=s}catch(e){}
+function alternaTema(){
+  const escuro=root.dataset.theme?root.dataset.theme==="dark":matchMedia("(prefers-color-scheme:dark)").matches;
+  const novo=escuro?"light":"dark";root.dataset.theme=novo;
+  try{localStorage.setItem("tema",novo)}catch(e){}
+  return novo==="dark"?"escuro":"claro";
+}
+$("#tema").onclick=alternaTema;
+
+/* terminal */
+const out=$("#out"),inp=$("#cmd");
+function say(txt,cls){const p=el("p",cls,txt);out.append(p);out.scrollTop=out.scrollHeight;return p}
+function sayLink(txt,url){const p=el("p");const a=el("a",null,txt);a.href=url;a.target="_blank";a.rel="noopener";p.append(a);out.append(p);out.scrollTop=out.scrollHeight}
+const irPara=id=>$(id).scrollIntoView({behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth"});
+const CMDS={
+  ajuda:()=>say("Comandos: sobre, stack, projetos [tecnologia], contato, tema, limpar"),
+  sobre:()=>{say(EU.bio);say(EU.curso+" | "+EU.faculdade+" | "+EU.local);irPara("#sobre")},
+  stack:()=>say("Tecnologias: "+techs.join(", ")+". Dica: projetos "+techs[0].toLowerCase()),
+  projetos:a=>{
+    const t=a?techs.find(x=>x.toLowerCase()===a.toLowerCase()):null;
+    if(a&&!t){say("Não achei a tecnologia “"+a+"”. Digite stack para ver as opções.","err");return}
+    aplica(t||null);
+    const ps=PROJETOS.filter(p=>!t||p.tech.includes(t));
+    say(ps.length?ps.map(p=>"• "+p.nome).join("\n"):"Nenhum projeto ainda com "+t+".");
+    irPara("#projetos");
+  },
+  contato:()=>{if(EU.email)say("E-mail: "+EU.email);if(EU.linkedin)sayLink("LinkedIn",EU.linkedin);sayLink("GitHub","https://github.com/"+EU.usuario)},
+  tema:()=>say("Tema "+alternaTema()+" ativado."),
+  limpar:()=>{out.textContent=""}
+};
+function roda(linha){
+  const [c,...r]=linha.trim().split(/\s+/);if(!c)return;
+  say("$ "+linha.trim(),"cmd");
+  const f=CMDS[c.toLowerCase()];
+  f?f(r.join(" ")):say("Comando “"+c+"” não existe. Digite ajuda para ver a lista.","err");
+}
+const hist=[];let hi=0;
+inp.addEventListener("keydown",e=>{
+  if(e.key==="Enter"){const v=inp.value;if(v.trim()){hist.push(v);hi=hist.length}roda(v);inp.value=""}
+  else if(e.key==="ArrowUp"&&hist.length){hi=Math.max(0,hi-1);inp.value=hist[hi];e.preventDefault()}
+  else if(e.key==="ArrowDown"&&hist.length){hi=Math.min(hist.length,hi+1);inp.value=hist[hi]||"";e.preventDefault()}
+});
+const at=$("#atalhos");
+["ajuda","sobre","stack","projetos","contato","tema"].forEach(c=>{
+  const b=el("button","chip",c);b.type="button";b.onclick=()=>roda(c);at.append(b);
+});
+say("Olá! Eu sou "+EU.nome+". Digite um comando ou toque nos atalhos abaixo.");
+</script>
+</body>
+</html>
