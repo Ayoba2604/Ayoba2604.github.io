@@ -100,6 +100,7 @@ footer{padding:3rem 0 2rem;color:var(--mute);font-size:.9rem}
 <h2>Projetos</h2>
 <p class="sub">Toque em uma tecnologia para filtrar. Toque em “Detalhes” para ver mais.</p>
 <div class="chips" id="filtros"></div>
+<p class="sub" id="status" aria-live="polite"></p>
 <div class="grid" id="lista"></div>
 <p class="empty" id="vazio" hidden>Nenhum projeto com essa tecnologia ainda. Escolha outra ou limpe o filtro.</p>
 </section>
@@ -125,7 +126,7 @@ const EU={
   papeis:["Desenvolvedor em formação","Criando sistemas web em PHP","Explorando Python e JavaScript","Aprendendo um commit por vez"]
 };
 const R="https://github.com/Ayoba2604/";
-const PROJETOS=[
+let PROJETOS=[
   {nome:"LEGISLA.IA2",desc:"Segunda versão do projeto Legisla.IA, feita em JavaScript.",det:"Projeto em JavaScript que evoluiu da primeira versão do Legisla.IA. Veja o código e o README no repositório.",tech:["JavaScript"],url:R+"LEGISLA.IA2"},
   {nome:"Gerenciamento de matéria",desc:"Sistema em PHP para gerenciar matérias de Engenharia de Software.",det:"Aplicação web em PHP para organizar as matérias do curso. Veja o código no repositório.",tech:["PHP"],url:R+"Gerenciamento-de-materia-Engenharia-de-Software"},
   {nome:"Trabalho TAPWM 2º bimestre",desc:"Trabalho do segundo bimestre da disciplina TAPWM, em PHP.",det:"Entrega acadêmica desenvolvida em PHP. Veja o código no repositório.",tech:["PHP"],url:R+"trabalho-TAPWM-2BIM"},
@@ -137,7 +138,8 @@ const PROJETOS=[
 
 const $=s=>document.querySelector(s);
 const el=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
-const techs=[...new Set(PROJETOS.flatMap(p=>p.tech))].sort();
+let techs=[];
+let REPOS=[],aoVivo=false;
 let filtro=null;
 
 $("#nome").textContent=EU.nome;
@@ -161,19 +163,8 @@ $("#bio").textContent=EU.bio;
 })();
 
 /* projetos */
-const lista=$("#lista");
-PROJETOS.forEach(p=>{
-  const c=el("article","card");c.dataset.tech=p.tech.join("|");
-  c.append(el("h3",null,p.nome),el("p",null,p.desc));
-  const tg=el("div","tags");p.tech.forEach(t=>tg.append(el("span",null,t)));c.append(tg);
-  c.append(el("p","more",p.det));
-  const a=el("div","acts");
-  const b=el("button",null,"Detalhes");b.type="button";b.setAttribute("aria-expanded","false");
-  b.onclick=()=>{const o=c.classList.toggle("open");b.setAttribute("aria-expanded",o);b.textContent=o?"Fechar":"Detalhes"};
-  const l=el("a",null,"Ver no GitHub");l.href=p.url;l.target="_blank";l.rel="noopener";
-  a.append(b,l);c.append(a);lista.append(c);
-});
-const fbox=$("#filtros");
+const lista=$("#lista"),fbox=$("#filtros");
+const fmt=d=>new Date(d).toLocaleDateString("pt-BR");
 function desenhaFiltros(){
   fbox.textContent="";
   techs.forEach(t=>{
@@ -188,7 +179,46 @@ function aplica(t){
   });
   $("#vazio").hidden=n>0;desenhaFiltros();
 }
-desenhaFiltros();
+function desenhaProjetos(){
+  lista.textContent="";
+  techs=[...new Set(PROJETOS.flatMap(p=>p.tech))].sort();
+  if(filtro&&!techs.includes(filtro))filtro=null;
+  PROJETOS.forEach(p=>{
+    const c=el("article","card");c.dataset.tech=p.tech.join("|");
+    c.append(el("h3",null,p.nome),el("p",null,p.desc));
+    const tg=el("div","tags");p.tech.forEach(t=>tg.append(el("span",null,t)));c.append(tg);
+    c.append(el("p","more",p.det));
+    const a=el("div","acts");
+    const b=el("button",null,"Detalhes");b.type="button";b.setAttribute("aria-expanded","false");
+    b.onclick=()=>{const o=c.classList.toggle("open");b.setAttribute("aria-expanded",o);b.textContent=o?"Fechar":"Detalhes"};
+    const l=el("a",null,"Ver no GitHub");l.href=p.url;l.target="_blank";l.rel="noopener";
+    a.append(b,l);c.append(a);lista.append(c);
+  });
+  aplica(filtro);
+}
+/* busca os repositórios ao vivo no GitHub; se falhar, mantém a lista salva acima */
+async function carregaRepos(){
+  const st=$("#status");st.textContent="Buscando seus projetos no GitHub...";
+  try{
+    const r=await fetch("https://api.github.com/users/"+EU.usuario+"/repos?sort=updated&per_page=30");
+    if(!r.ok)throw new Error(r.status);
+    REPOS=(await r.json()).filter(x=>!x.fork&&!/\.github\.io$/i.test(x.name)&&x.name.toLowerCase()!==EU.usuario.toLowerCase());
+    if(!REPOS.length)throw new Error("vazio");
+    const fixos=new Map(PROJETOS.map(p=>[p.url.toLowerCase(),p]));
+    PROJETOS=REPOS.map(x=>fixos.get(x.html_url.toLowerCase())||{
+      nome:x.name.replace(/[-_]+/g," "),
+      desc:x.description||"Repositório em "+(x.language||"várias linguagens")+".",
+      det:"Atualizado em "+fmt(x.pushed_at)+(x.stargazers_count?" • "+x.stargazers_count+" estrelas":"")+". Veja o código no repositório.",
+      tech:[x.language||"Outro"],url:x.html_url});
+    aoVivo=true;desenhaProjetos();
+    $("#fatos").lastChild.lastChild.textContent=PROJETOS.length+" no GitHub";
+    st.textContent="Lista atualizada ao vivo pelo GitHub. Projetos novos aparecem aqui sozinhos.";
+  }catch(e){
+    st.textContent="Não consegui buscar no GitHub agora. Mostrando a lista salva.";
+  }
+}
+desenhaProjetos();
+const carga=carregaRepos();
 
 /* contato */
 const ct=$("#ct");
@@ -218,7 +248,7 @@ function say(txt,cls){const p=el("p",cls,txt);out.append(p);out.scrollTop=out.sc
 function sayLink(txt,url){const p=el("p");const a=el("a",null,txt);a.href=url;a.target="_blank";a.rel="noopener";p.append(a);out.append(p);out.scrollTop=out.scrollHeight}
 const irPara=id=>$(id).scrollIntoView({behavior:matchMedia("(prefers-reduced-motion:reduce)").matches?"auto":"smooth"});
 const CMDS={
-  ajuda:()=>say("Comandos: sobre, stack, projetos [tecnologia], contato, tema, limpar"),
+  ajuda:()=>say("Comandos: sobre, stack, projetos [tecnologia], repos, skills, neofetch, contato, tema, limpar"),
   sobre:()=>{say(EU.bio);say(EU.curso+" | "+EU.faculdade+" | "+EU.local);irPara("#sobre")},
   stack:()=>say("Tecnologias: "+techs.join(", ")+". Dica: projetos "+techs[0].toLowerCase()),
   projetos:a=>{
@@ -230,14 +260,31 @@ const CMDS={
     irPara("#projetos");
   },
   contato:()=>{if(EU.email)say("E-mail: "+EU.email);if(EU.linkedin)sayLink("LinkedIn",EU.linkedin);sayLink("GitHub","https://github.com/"+EU.usuario)},
+  repos:async()=>{
+    await carga;
+    say((aoVivo?"Ao vivo do GitHub":"Lista salva")+" ("+PROJETOS.length+" projetos):");
+    say(PROJETOS.map(p=>"• "+p.nome+" ["+p.tech.join(", ")+"]").join("\n"));
+  },
+  skills:()=>{
+    const n={};PROJETOS.forEach(p=>p.tech.forEach(t=>n[t]=(n[t]||0)+1));
+    const max=Math.max(1,...Object.values(n));
+    say("Repositórios por linguagem:\n"+Object.entries(n).sort((a,b)=>b[1]-a[1]).map(([t,c])=>t.padEnd(12)+"█".repeat(Math.max(1,Math.round(c/max*16)))+" "+c).join("\n"));
+  },
+  neofetch:()=>say(EU.usuario+"@github\n------------------\nNome:   "+EU.nome+"\nLocal:  "+EU.local+"\nRepos:  "+PROJETOS.length+"\nStack:  "+techs.join(", ")),
+  sudo:a=>{
+    if((a||"").toLowerCase()==="contratar"){
+      say("[sudo] senha para recrutador: ********");
+      setTimeout(()=>say("Permissão concedida. "+EU.nome.split(" ")[0]+" está aberto a estágios e projetos. Digite contato."),700);
+    }else say("sudo: tente sudo contratar","err");
+  },
   tema:()=>say("Tema "+alternaTema()+" ativado."),
   limpar:()=>{out.textContent=""}
 };
-function roda(linha){
+async function roda(linha){
   const [c,...r]=linha.trim().split(/\s+/);if(!c)return;
   say("$ "+linha.trim(),"cmd");
   const f=CMDS[c.toLowerCase()];
-  f?f(r.join(" ")):say("Comando “"+c+"” não existe. Digite ajuda para ver a lista.","err");
+  f?await f(r.join(" ")):say("Comando “"+c+"” não existe. Digite ajuda para ver a lista.","err");
 }
 const hist=[];let hi=0;
 inp.addEventListener("keydown",e=>{
@@ -246,7 +293,7 @@ inp.addEventListener("keydown",e=>{
   else if(e.key==="ArrowDown"&&hist.length){hi=Math.min(hist.length,hi+1);inp.value=hist[hi]||"";e.preventDefault()}
 });
 const at=$("#atalhos");
-["ajuda","sobre","stack","projetos","contato","tema"].forEach(c=>{
+["ajuda","sobre","stack","repos","skills","neofetch","contato","tema"].forEach(c=>{
   const b=el("button","chip",c);b.type="button";b.onclick=()=>roda(c);at.append(b);
 });
 say("Olá! Eu sou "+EU.nome+". Digite um comando ou toque nos atalhos abaixo.");
